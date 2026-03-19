@@ -1,0 +1,543 @@
+{
+  "name": "Instagram Profile Matcher",
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1-EOKO9ZANcu6mVusD443zzf-3MuilHAYcVtM6OqUXwk",
+          "mode": "list",
+          "cachedResultName": "Copy of Mastersheet - 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-EOKO9ZANcu6mVusD443zzf-3MuilHAYcVtM6OqUXwk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-EOKO9ZANcu6mVusD443zzf-3MuilHAYcVtM6OqUXwk/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Gender",
+              "lookupValue": "={{ $json.Gender }}"
+            },
+            {
+              "lookupColumn": "State",
+              "lookupValue": "={{ $json.Location }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "98339fc9-8595-4ecd-b8f7-c7d200b3070f",
+      "name": "Read Source Sheet 1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        464,
+        384
+      ],
+      "executeOnce": false,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "BISqmD4R4PTCG34i",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all items from both source sheets\nconst allProfiles = $input.all();\n\n// Get the business requirement from the form response\nconst formData = $('Received new client requirement').first().json;\n\n// Filter profiles based on requirements\n// This is a simple example - customize the matching logic based on your needs\nconst matchingProfiles = allProfiles.filter(profile => {\n  // Example: match by niche, location, budget, etc.\n  // Customize this logic based on your form fields and sheet columns\n  return true; // For now, return all profiles\n});\n\nreturn matchingProfiles.map(profile => ({ json: profile.json }));"
+      },
+      "id": "09e3f9e2-9d5f-4bbc-952e-419b5ed6ede6",
+      "name": "Combine All Profiles",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        912,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1jy_sP39LuiQZ0dWugBJiiGhv40V4GhJPVlc-mkvJrlE",
+          "mode": "list",
+          "cachedResultName": "Copy of Mastersheet - 3",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jy_sP39LuiQZ0dWugBJiiGhv40V4GhJPVlc-mkvJrlE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jy_sP39LuiQZ0dWugBJiiGhv40V4GhJPVlc-mkvJrlE/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Gender",
+              "lookupValue": "={{ $json.Gender }}"
+            },
+            {
+              "lookupColumn": "State",
+              "lookupValue": "={{ $json.Location }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fb31cf0d-1330-4bfa-b1f2-1364c9ba66dd",
+      "name": "Read Source Sheet 2",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        464,
+        576
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "BISqmD4R4PTCG34i",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "spreadsheet",
+        "title": "={{ $('Received new client requirement').item.json['Brand name'] }} Brand sheet",
+        "sheetsUi": {
+          "sheetValues": [
+            {
+              "title": "Sheet 1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "439d08aa-780c-4219-b379-b9fb1d69001c",
+      "name": "Create Client Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1136,
+        480
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "BISqmD4R4PTCG34i",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $(\"Create Client Sheet\").item.json.spreadsheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet 1",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('Combine All Profiles').item.json.Name }}",
+            "Profile Link": "={{ $('Combine All Profiles').item.json['Instagram profile link'] }}",
+            "Gender": "={{ $('Combine All Profiles').item.json.Gender }}",
+            "State": "={{ $('Combine All Profiles').item.json.State }}",
+            "City": "={{ $('Combine All Profiles').item.json.City }}",
+            "Followers": "={{ $('Combine All Profiles').item.json.Followers }}",
+            "Primary Category": "={{ $('Combine All Profiles').item.json['Primary Category'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Profile Link",
+              "displayName": "Profile Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Gender",
+              "displayName": "Gender",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "State",
+              "displayName": "State",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "City",
+              "displayName": "City",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Followers",
+              "displayName": "Followers",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Primary Category",
+              "displayName": "Primary Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "id": "49b4266c-e1a5-4613-806c-e65d0216caf3",
+      "name": "Add Matching Profiles",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1584,
+        480
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "BISqmD4R4PTCG34i",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {}
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1MNGV5_M0uPBFm2ibS4mw2H3WcKCh8bn1poSqXEJS-SA",
+          "mode": "list",
+          "cachedResultName": "Client Requirements",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1MNGV5_M0uPBFm2ibS4mw2H3WcKCh8bn1poSqXEJS-SA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1MNGV5_M0uPBFm2ibS4mw2H3WcKCh8bn1poSqXEJS-SA/edit#gid=0"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "id": "36ffb22c-d575-4a5e-a49b-5f3566985720",
+      "name": "Received new client requirement",
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        480
+      ],
+      "executeOnce": false,
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "yDgSnILz7H3f3fUe",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const followerValue = $input.item.json.Followers;\nconst formData = $(\"Received new client requirement\").first().json;\nconst minFollowers = formData[\"Min Followers\"];\nconst maxFollowers = formData[\"Max Followers\"];\n\nlet numericFollowers = followerValue;\n\nif (typeof followerValue === \"string\") {\n  const lowerValue = followerValue.toLowerCase().trim();\n  \n  if (lowerValue.includes(\"k\")) {\n    const numPart = parseFloat(lowerValue.replace(\"k\", \"\"));\n    numericFollowers = Math.round(numPart * 1000);\n  } else if (lowerValue.includes(\"m\")) {\n    const numPart = parseFloat(lowerValue.replace(\"m\", \"\"));\n    numericFollowers = Math.round(numPart * 1000000);\n  } else if (lowerValue.includes(\"l\")) {\n    const numPart = parseFloat(lowerValue.replace(\"l\", \"\"));\n    numericFollowers = Math.round(numPart * 100000);\n  } else {\n    numericFollowers = parseInt(followerValue) || followerValue;\n  }\n}\n\nif (numericFollowers >= minFollowers && numericFollowers <= maxFollowers) {\n  return {\n    ...($input.item.json),\n    Followers: numericFollowers\n  };\n}\n\nreturn null;"
+      },
+      "id": "34d05ecc-8c10-4a3f-8345-3de8f0e119eb",
+      "name": "Convert and Filter Sheet 1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        688,
+        384
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const followerValue = $input.item.json.Followers;\nconst formData = $(\"Received new client requirement\").first().json;\nconst minFollowers = formData[\"Min Followers\"];\nconst maxFollowers = formData[\"Max Followers\"];\n\nlet numericFollowers = followerValue;\n\nif (typeof followerValue === \"string\") {\n  const lowerValue = followerValue.toLowerCase().trim();\n  \n  if (lowerValue.includes(\"k\")) {\n    const numPart = parseFloat(lowerValue.replace(\"k\", \"\"));\n    numericFollowers = Math.round(numPart * 1000);\n  } else if (lowerValue.includes(\"m\")) {\n    const numPart = parseFloat(lowerValue.replace(\"m\", \"\"));\n    numericFollowers = Math.round(numPart * 1000000);\n  } else if (lowerValue.includes(\"l\")) {\n    const numPart = parseFloat(lowerValue.replace(\"l\", \"\"));\n    numericFollowers = Math.round(numPart * 100000);\n  } else {\n    numericFollowers = parseInt(followerValue) || followerValue;\n  }\n}\n\nif (numericFollowers >= minFollowers && numericFollowers <= maxFollowers) {\n  return {\n    ...($input.item.json),\n    Followers: numericFollowers\n  };\n}\n\nreturn null;"
+      },
+      "id": "9ab8aeae-c9b8-442a-ad3d-b47d4f747b20",
+      "name": "Convert and Filter Sheet 2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        688,
+        576
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $(\"Create Client Sheet\").item.json.spreadsheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet 1",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "Name",
+            "Followers": "Followers",
+            "Profile Link": "Profile Link",
+            "Gender": "Gender",
+            "City": "City",
+            "State": "State"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Followers",
+              "displayName": "Followers",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Profile Link",
+              "displayName": "Profile Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Gender",
+              "displayName": "Gender",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "City",
+              "displayName": "City",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "State",
+              "displayName": "State",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "id": "b5ef8386-b8dd-43ff-881f-a1f85e982b75",
+      "name": "Add Column Headings",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1360,
+        480
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "BISqmD4R4PTCG34i",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Read Source Sheet 1": {
+      "main": [
+        [
+          {
+            "node": "Convert and Filter Sheet 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine All Profiles": {
+      "main": [
+        [
+          {
+            "node": "Create Client Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Source Sheet 2": {
+      "main": [
+        [
+          {
+            "node": "Convert and Filter Sheet 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Client Sheet": {
+      "main": [
+        [
+          {
+            "node": "Add Column Headings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Received new client requirement": {
+      "main": [
+        [
+          {
+            "node": "Read Source Sheet 1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Read Source Sheet 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert and Filter Sheet 1": {
+      "main": [
+        [
+          {
+            "node": "Combine All Profiles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert and Filter Sheet 2": {
+      "main": [
+        [
+          {
+            "node": "Combine All Profiles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Matching Profiles": {
+      "main": [
+        []
+      ]
+    },
+    "Add Column Headings": {
+      "main": [
+        [
+          {
+            "node": "Add Matching Profiles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "12c7026d-e57c-4bcc-bbcb-dcae2ba0e293",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bd9b05febe711f20a54aab55445f547d33e1fd31e7875926ef23ee39fee00417"
+  },
+  "id": "bGEe7iN0gFJG9OMp",
+  "tags": []
+}
